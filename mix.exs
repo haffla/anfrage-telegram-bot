@@ -11,7 +11,6 @@ defmodule Anfrage.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
@@ -20,8 +19,11 @@ defmodule Anfrage.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [{:nadia, "~> 0.6.0"}]
+    [
+      {:nadia, "~> 0.6.0"},
+      {:httpoison, "~> 1.6"},
+      {:floki, "~> 0.26.0"}
+    ]
   end
 end
