@@ -49,13 +49,13 @@ defmodule Anfrage.Poller do
   end
 
   defp process_update(update) do
-    {title, link} = case HTTPoison.get("https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html") do
+    {title, link, subtitle} = case HTTPoison.get("https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> process_html(body)
       _ -> {"Nothing", "Now"}
     end
 
-    message = "#{title}\n\nhttps://www.bmwi.de#{link}"
-    Nadia.send_message(update.message.chat.id, message)
+    message = "*#{title}*\n\n#{subtitle}\n\nhttps://www.bmwi.de#{link}"
+    Nadia.send_message(update.message.chat.id, message, parse_mode: "Markdown")
   end
 
   defp process_html(body) do
@@ -75,6 +75,10 @@ defmodule Anfrage.Poller do
       f -> Floki.attribute(f, "href")
     end
 
-    {title, link}
+    subtitle = case Floki.find([card], ".card-subtitle") do
+      f -> Floki.text(f) |> String.trim
+    end
+
+    {title, link, subtitle}
   end
 end
