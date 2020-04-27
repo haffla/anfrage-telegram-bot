@@ -49,38 +49,33 @@ defmodule Anfrage.Poller do
   end
 
   defp process_update(update) do
-    {title, link, subtitle} = case HTTPoison.get("https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html") do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> process_html(body)
-      _ -> {"Nothing", "Now"}
-    end
+    {title, link, subtitle, date} =
+      case HTTPoison.get(
+             "https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html"
+           ) do
+        {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> process_html(body)
+        _ -> {"Nothing", "Here", "Now", "No"}
+      end
 
     link = "https://www.bmwi.de#{link}"
-    message = "*#{title}*\n\n#{subtitle}"
-    Nadia.send_message(update.message.chat.id, message, parse_mode: "Markdown")
-    Nadia.send_message(update.message.chat.id, link)
+    message = "#{date}\n\n#{title}\n\n#{subtitle}\n\n#{link}"
+    Nadia.send_message(update.message.chat.id, message)
   end
 
   defp process_html(body) do
     {:ok, document} = Floki.parse_document(body)
 
     case Floki.find(document, ".card-list-item .card") do
-      [head | _tail] -> process_card(head)
+      [{_tag, _attrs, children} | _tail] -> process_card(children)
     end
   end
 
   defp process_card(card) do
-    title = case Floki.find([card], ".card-title .card-title-label") do
-      [{_tag, _attrs, [title]} | _tail] -> title
-    end
+    subtitle = Floki.find(card, ".card-subtitle") |> Floki.text() |> String.trim()
+    title = Floki.find(card, ".card-title .card-title-label") |> Floki.text() |> String.trim()
+    date = Floki.find(card, ".card-topline .date") |> Floki.text() |> String.trim()
+    link = Floki.find(card, ".card-link-overlay") |> Floki.attribute("href")
 
-    link = case Floki.find([card], ".card-link-overlay") do
-      f -> Floki.attribute(f, "href")
-    end
-
-    subtitle = case Floki.find([card], ".card-subtitle") do
-      f -> Floki.text(f) |> String.trim
-    end
-
-    {title, link, subtitle}
+    {title, link, subtitle, date}
   end
 end
