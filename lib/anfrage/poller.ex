@@ -54,8 +54,10 @@ defmodule Anfrage.Poller do
       _ -> {"Nothing", "Now"}
     end
 
-    message = "*#{title}*\n\n#{subtitle}\n\nhttps://www.bmwi.de#{link}"
+    link = "https://www.bmwi.de#{link}"
+    message = "*#{title}*\n\n#{subtitle}"
     Nadia.send_message(update.message.chat.id, message, parse_mode: "Markdown")
+    Nadia.send_message(update.message.chat.id, link)
   end
 
   defp process_html(body) do
