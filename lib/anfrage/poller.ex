@@ -49,17 +49,38 @@ defmodule Anfrage.Poller do
   end
 
   defp process_update(update) do
-    {title, link, subtitle, date} =
-      case HTTPoison.get(
-             "https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html"
-           ) do
-        {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> process_html(body)
-        _ -> {"Nothing", "Here", "Now", "No"}
+    search =
+      case update.message.text do
+        "/neu" -> ""
+        s -> s
       end
 
-    link = "https://www.bmwi.de#{link}"
-    message = "#{date}\n\n#{title}\n\n#{subtitle}\n\n#{link}"
-    Nadia.send_message(update.message.chat.id, message)
+    case request(search) do
+      {title, link, subtitle, date} ->
+        link = "https://www.bmwi.de#{link}"
+        message = "#{date}\n\n#{title}\n\n#{subtitle}\n\n#{link}"
+        Nadia.send_message(update.message.chat.id, message)
+
+      {:error, :empty} ->
+        Nadia.send_message(update.message.chat.id, "#{search}? Nein!")
+
+      {:error, :http} ->
+        Nadia.send_message(
+          update.message.chat.id,
+          "Es gab ein Fehler. Probieren Sie es bitte erneut!"
+        )
+    end
+  end
+
+  defp request(search) do
+    case HTTPoison.get(
+           "https://www.bmwi.de/SiteGlobals/BMWI/Forms/Listen/Parlamentarische-Anfragen/Parlamentarische-Anfragen_Formular.html?templateQueryStringListen=#{
+             search
+           }"
+         ) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> process_html(body)
+      _ -> {:error, :http}
+    end
   end
 
   defp process_html(body) do
@@ -67,6 +88,7 @@ defmodule Anfrage.Poller do
 
     case Floki.find(document, ".card-list-item .card") do
       [{_tag, _attrs, children} | _tail] -> process_card(children)
+      _ -> {:error, :empty}
     end
   end
 
