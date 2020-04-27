@@ -13,7 +13,7 @@ defmodule Anfrage.MixProject do
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :plug_cowboy],
       mod: {Anfrage.Application, []},
       applications: [:nadia]
     ]
@@ -23,7 +23,8 @@ defmodule Anfrage.MixProject do
     [
       {:nadia, "~> 0.6.0"},
       {:httpoison, "~> 1.6"},
-      {:floki, "~> 0.26.0"}
+      {:floki, "~> 0.26.0"},
+      {:plug_cowboy, "~> 2.0"}
     ]
   end
 end
