@@ -49,6 +49,8 @@ defmodule Anfrage.Poller do
   end
 
   defp process_update(update) do
+    Nadia.send_chat_action(update.message.chat.id, "typing")
+
     search =
       case update.message.text do
         "/neu" -> ""
