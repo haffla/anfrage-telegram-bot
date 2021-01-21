@@ -11,13 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Gigalixir and login
+        run: |
+          python -m pip install --upgrade pip
+          pip install gigalixir --user
+          gigalixir login -e "$GIGALIXIR_EMAIL" -p "$GIGALIXIR_PASSWORD"
       - name: Commit
         run: |
           git config --global user.email "jakop@pm.me"
           git config --global user.name "Jakob Pupke"
-          git config --global pull.rebase false
-          git remote add gigalixir "$GIGALIXIR_REMOTE"
-          git pull gigalixir master
+          gigalixir git:remote "$GIGALIXIR_APP"
           git commit --allow-empty -m "Force deploy"
           git push gigalixir master
         env:
