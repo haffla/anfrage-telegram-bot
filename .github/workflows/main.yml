@@ -1,0 +1,19 @@
+name: DEPLOY
+
+on:
+  schedule:
+    - cron:  '0 0 */7 * *'
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: EndBug/add-and-commit@v7
+        with:
+          message: Force deploy
+          author_name: Jakob Pupke
+          author_email: jakop@pm.me
