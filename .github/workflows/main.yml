@@ -14,7 +14,7 @@ jobs:
       - name: Commit
         run: |
           git remote add gigalixir "$GIGALIXIR_REMOTE"
-          git commit --allow-empty "Force deploy"
+          git commit --allow-empty -m "Force deploy"
           git push gigalixir master
         env:
           GIGALIXIR_REMOTE: ${{ secrets.GIGALIXIR_REMOTE }}
