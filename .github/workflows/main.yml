@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Commit
         run: |
+          git config --global user.email "jakop@pm.me"
+          git config --global user.name "Jakob Pupke"
           git remote add gigalixir "$GIGALIXIR_REMOTE"
           git commit --allow-empty -m "Force deploy"
           git push gigalixir master
