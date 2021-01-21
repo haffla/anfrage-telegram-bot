@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
-      - uses: EndBug/add-and-commit@v7
-        with:
-          message: Force deploy
-          author_name: Jakob Pupke
-          author_email: jakop@pm.me
+      - name: Commit
+        run: |
+          git remote add gigalixir "$GIGALIXIR_REMOTE"
+          git commit --allow-empty "Force deploy"
+          git push gigalixir master
+        env:
+          GIGALIXIR_REMOTE: ${{ secrets.GIGALIXIR_REMOTE }}
