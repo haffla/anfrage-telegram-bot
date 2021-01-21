@@ -27,7 +27,7 @@ jobs:
         run: |
           git config --global user.email "jakop@pm.me"
           git config --global user.name "Jakob Pupke"
-          git clone "$GIGALIXIR_REMOTE"
+          git clone "$GIGALIXIR_REMOTE" anfrage && cd anfrage
           git commit --allow-empty -m "Force deploy"
           git push origin master
         env:
