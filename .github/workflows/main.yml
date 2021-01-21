@@ -10,7 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -28,8 +27,9 @@ jobs:
         run: |
           git config --global user.email "jakop@pm.me"
           git config --global user.name "Jakob Pupke"
-          gigalixir git:remote "$GIGALIXIR_APP"
+          git clone "$GIGALIXIR_REMOTE"
           git commit --allow-empty -m "Force deploy"
-          git push gigalixir master
+          git push origin master
         env:
           GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP }}
+          GIGALIXIR_REMOTE: ${{ secrets.GIGALIXIR_REMOTE }}
