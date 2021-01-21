@@ -32,4 +32,4 @@ jobs:
           git commit --allow-empty -m "Force deploy"
           git push gigalixir master
         env:
-          GIGALIXIR_REMOTE: ${{ secrets.GIGALIXIR_REMOTE }}
+          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP }}
